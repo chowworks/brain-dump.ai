@@ -100,13 +100,24 @@ Do not re-litigate these without new sources.
   free and unlimited. Open question whether persistent re-surfacing should move to
   PRO — it improves the pricing story but weakens a free tier we want to be better
   than the competitor's. Unresolved; this is a positioning call.
-- **Name.** `getbraindump.com` already ships "Brain Dump: AI Notes & Writing".
-  We are building a website, not a mobile app, so store confusion is not the
-  mechanism — the exposure is (a) SEO, since their App Store page ranks in Google
-  for our brand terms, and (b) trademark, since Class 42 covers SaaS and websites
-  regardless of how we distribute. "Brain dump" is descriptive and therefore a
-  weak mark. `mind-dump` is the fallback. Needs a USPTO TESS search in classes 9
-  and 42 — unresolved.
+- **Name: DECIDED — `mind-dump.com`, with `brain-dump.ai` forwarding to it.**
+  USPTO TESS turned up no "brain dump" mark, so the trademark objection that
+  drove this is gone. The decision came down to TLD, not to the words:
+
+  `.com` is what people type by reflex, costs ~$12/year against ~$70–100 for
+  `.ai`, and reads as trustworthy to a mainstream audience that is overwhelmed
+  rather than tech-forward. `brain-dump` is the stronger idiom, but the SEO
+  advantage assumed we could rank for it — and we cannot: `getbraindump.com`
+  holds the phrase, a `.com`, and an App Store listing that ranks in Google.
+  Paying the `.ai` premium for a keyword we cannot cash made no sense.
+  `brain-dump.ai` is kept and forwarded so the keyword and any existing links
+  are not thrown away.
+
+  **Accepted risk:** "mind dump" has lower search volume than "brain dump", and
+  both are descriptive phrases and therefore weak marks. We are not trying to own
+  the head term. Acquisition targets long-tail intent — "ADHD brain dump",
+  "brain dump reminders", "brain dump to actionable tasks" — where the outbound
+  loop is the differentiator and a plain notes app is not competing.
 - **Messaging vendor.** Linq does iMessage + RCS + SMS fallback through one API.
   Hobby is $0/mo but capped at **20 contacts** — a development tier, good for
   building and testing the integration at no cost, not something users can be
