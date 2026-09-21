@@ -42,7 +42,12 @@ Do not re-litigate these without new sources.
   surcharges on a higher base — but budget $0.008, not $0.004.
 - SMS long code rental: **$1.00/month per number**. A free user can never have a
   dedicated number.
-- **Sendblue is disqualified**: $100/line/month. Consumer scale is impossible.
+- **Sendblue is NOT disqualified — that call was based on a wrong assumption.**
+  It was ruled out at $100/line/month on the assumption that lines scale with
+  users. Under an inbound-only design where one shared number serves everyone via
+  caller-ID routing, $100/month is flat. Their "AI Agent" plan is inbound-first,
+  which is a limitation for sales teams and exactly what we want. See the
+  messaging vendor entry under Open decisions.
 - **Transform cost is dominated by model choice, not by the quota.** Haiku 4.5
   ≈ $0.003/transform vs Opus 5 ≈ $0.020 — 6.5x for the same structured
   extraction job. Pin the transform to Haiku and keep the model a config value.
@@ -99,6 +104,20 @@ Do not re-litigate these without new sources.
   inbound-only avoids 10DLC. Evaluate in their free sandbox before committing.
   Decision for now: **build against Hobby, keep outbound on push + email.**
 
+  Sendblue is back in contention on the same inbound-only logic: its AI Agent
+  plan is ~$100/month with a dedicated number, iMessage + RCS + SMS fallback,
+  an MCP server, and SOC 2 — cheaper than Linq Pro if the number is shared.
+  **The deciding figure is its "up to 1,000 inbound contacts/day" cap:** if that
+  counts distinct contacts rather than messages, it is a hard ceiling on daily
+  active senders and breaks well before 10k users. Nobody has confirmed which.
+
+  **Treat vendor comparison tables as marketing, not data.** Sendblue's own
+  comparison page states Linq is "~$250/mo with $1,000+ setup and contact-sales
+  for a free tier"; Linq's actual pricing page shows $289/mo with a $0 Hobby tier
+  and no credit card required. A vendor that is wrong about the one competitor we
+  can verify is not a source for the ones we cannot. Confirm every number in a
+  free sandbox or directly with the vendor before it enters this file.
+
 ## Stack
 
 Turborepo + npm workspaces, Node ≥22. Mirrors `ludakhris/interview-differently`.
@@ -151,65 +170,17 @@ They never block opening one.
 
 Backend-only changes don't need screenshots — don't invent a UI to photograph.
 
-# How We Develop (Company Std Guidance for all projects)
+# How we work
 
-## 1. Think Before Coding
+The company-wide development and decision standards are deliberately NOT applied
+to this project — we are running it through agents instead. Three rules survive,
+and they exist so a bad change can be found and undone:
 
-**Don't assume. Don't hide confusion. Surface tradeoffs.**
+1. **Every feature has a GitHub Issue.** Backlog lives in Issues, never a file.
+2. **Every UI feature closes with screenshots** committed to the repo and linked
+   from its issue by commit SHA (see above).
+3. **One commit per feature**, referencing its issue (`Closes #N` / `Refs #N`).
+   Commits stay feature-sized specifically so a single feature can be reverted
+   without unpicking unrelated work.
 
-- State your assumptions explicitly. If uncertain, ask.
-- If multiple interpretations exist, present them - don't pick silently.
-- If a simpler approach exists, say so. Push back when warranted.
-- If something is unclear, stop. Name what's confusing. Ask.
-
-## 2. Simplicity First
-
-**Minimum code that solves the problem. Nothing speculative.**
-
-- No features beyond what was asked.
-- No abstractions for single-use code.
-- No "flexibility" or "configurability" that wasn't requested.
-- No error handling for impossible scenarios.
-- If you write 200 lines and it could be 50, rewrite it.
-
-## 3. Surgical Changes
-
-**Touch only what you must. Clean up only your own mess.**
-
-- Don't "improve" adjacent code, comments, or formatting.
-- Don't refactor things that aren't broken.
-- Match existing style, even if you'd do it differently.
-- If you notice unrelated dead code, mention it - don't delete it.
-- Remove imports/variables/functions that YOUR changes made unused.
-
-Every changed line should trace directly to the user's request.
-
-## 4. Always Confirm Before Committing
-
-**Never commit or push without explicit user approval.** Summarize what will be
-committed and ask. This applies even when the user said "commit" earlier in
-conversation — always re-confirm at the point of execution.
-
-## 5. Goal-Driven Execution
-
-**Define success criteria. Loop until verified.**
-
-- "Add validation" → "Write tests for invalid inputs, then make them pass"
-- "Fix the bug" → "Write a test that reproduces it, then make it pass"
-
-## 6. When Committing Always Update the Associated GitHub Issue
-
-- Ensure the new feature is captured in screenshots stored in the project
-- Comment on the GH issue describing the feature with the screenshots
-- If the issue has a checklist, update it
-
-# How We Make Decisions (Company Std Guidance for all projects)
-
-1. **NO GUESSING.** If you don't know, say "I don't know" and find the answer.
-   Never invent facts. When you cite a fact, name the source.
-2. **NO FLATTERY.** Tell me what a smart skeptic would say before anything
-   supportive. If the idea is bad, say it's bad.
-3. **NO ONE-SIDED ANSWERS.** After your first take, argue the opposite position
-   with equal force. Then say which side actually holds up.
-
-Apply these to every reply, even short ones.
+Commits do not need approval before landing.
