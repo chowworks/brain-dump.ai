@@ -113,6 +113,12 @@ Do not re-litigate these without new sources.
   `brain-dump.ai` is kept and forwarded so the keyword and any existing links
   are not thrown away.
 
+  Both domains are registered. `minddump.com` unhyphenated was checked and is
+  taken, so the hyphenated form stands. **DNS is managed at Spaceship** — any
+  record work (Vercel, Resend DKIM/SPF, the `brain-dump.ai` 301) happens there.
+  The repo keeps the name `brain-dump.ai`; it is internal and does not need to
+  match the product domain.
+
   **Accepted risk:** "mind dump" has lower search volume than "brain dump", and
   both are descriptive phrases and therefore weak marks. We are not trying to own
   the head term. Acquisition targets long-tail intent — "ADHD brain dump",
