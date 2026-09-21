@@ -92,9 +92,31 @@ Do not re-litigate these without new sources.
   that; routing MUST ignore an unverified number, or anyone who claims someone
   else's number receives that person's dumps. The verification flow itself is
   not built yet.
-- **MindChuk's actual price is unknown.** mindchuk.com is blocked by the egress
-  proxy. Every argument about our subscription reads differently at $15 than at
-  $79. Highest-value open lookup.
+- **Competitors, confirmed by visiting both sites (2026-09-21).**
+
+  **MindChuk — $55, one-time. "One-time payment. Yours forever."** Claims 100+
+  five-star reviews. Positioning: "The fastest way to get something out of your
+  head and into your own private searchable feed." At $12/month we pass $55 in
+  4.6 months, so the pitch can never be "cheaper" — it has to be worth $12 every
+  month on its own. Site is pure black with monospace body copy, everything
+  centered, a typing-cursor headline gimmick and a "Someone from Seattle just
+  purchased" widget.
+
+  **getbraindump.com is the more dangerous competitor, and we under-rated it.**
+  "Dump your brain. Clear your mind. / The ADHD brain dump app that finally gets
+  it." They target ADHD *explicitly and by name*. **Free forever. No account, no
+  credit card.** 10,000+ users, 4.8 App Store rating across 208 ratings.
+
+  **Their tier model is nearly identical to ours** — free with a limited monthly
+  AI allowance, paid "Focus" plan for unlimited AI. We are not differentiated on
+  pricing structure at all, and they got there first with 10k users.
+
+  **The gap: they are Apple-only** — Mac, iPhone, iPad, Vision Pro. No web, no
+  Android. And they are a *notes app with AI query* ("what did I write about…?"),
+  which is retrieval you initiate. Neither of them has the outbound loop. That
+  remains the differentiation, and it is now the *only* one — so a plan that
+  waters it down (see the open meter question) removes the last thing separating
+  us from an incumbent with a free tier and 10,000 users.
 - **The meter may be on the wrong thing.** CLAUDE.md calls the outbound loop the
   moat, but TIER_LIMITS meters the transform and gives push/email reminders away
   free and unlimited. Open question whether persistent re-surfacing should move to
