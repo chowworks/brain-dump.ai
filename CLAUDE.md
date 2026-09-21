@@ -36,10 +36,20 @@ our costs recur. Every PRO feature must strengthen that answer.
 
 Do not re-litigate these without new sources.
 
-- SMS long code rental: **$1–2/user/month before any messages**. A free user can
-  never have a dedicated number.
-- **Telnyx ≈ $0.004/msg** — chosen over Twilio (≈$0.008) on price.
+- **Telnyx all-in ≈ $0.008 per message part**, not $0.004. The $0.004 is the base
+  rate; US carriers add a surcharge per part (T-Mobile $0.003, AT&T $0.0035,
+  Verizon $0.0045). Telnyx still beats Twilio, which passes through the same
+  surcharges on a higher base — but budget $0.008, not $0.004.
+- SMS long code rental: **$1.00/month per number**. A free user can never have a
+  dedicated number.
 - **Sendblue is disqualified**: $100/line/month. Consumer scale is impossible.
+- **Transform cost is dominated by model choice, not by the quota.** Haiku 4.5
+  ≈ $0.003/transform vs Opus 5 ≈ $0.020 — 6.5x for the same structured
+  extraction job. Pin the transform to Haiku and keep the model a config value.
+  `Transform.model` exists so this can be measured per model.
+- **Anything that runs on a schedule costs money per user whether they engage or
+  not.** Scheduled work must be gated on tier AND recent activity AND capped
+  input, and must use the Batch API (50% off, no latency requirement).
 - **A2P 10DLC is mandatory and provider-independent.** US carriers have blocked
   100% of unregistered 10DLC traffic since Feb 2025 (The Campaign Registry).
   ~5–7 business days to approve; registering EIN must be ≥15 days old. Switching
@@ -47,6 +57,21 @@ Do not re-litigate these without new sources.
 
 ## Open decisions
 
+- **Dedicated SMS number per user, or a shared pool?** `User.smsNumber` in
+  `packages/types` currently assumes one number per user — that is $10,000/month
+  in rental at 10k PRO users. Inbound SMS identifies the sender by caller ID, so
+  a pool sized to *throughput* rather than user count plausibly costs $50–100/month
+  instead. The only thing forcing more numbers is 10DLC per-campaign throughput
+  and daily volume caps, which nobody has looked up yet. **Resolve this before the
+  field reaches a migration.**
+- **MindChuk's actual price is unknown.** mindchuk.com is blocked by the egress
+  proxy. Every argument about our subscription reads differently at $15 than at
+  $79. Highest-value open lookup.
+- **The meter may be on the wrong thing.** CLAUDE.md calls the outbound loop the
+  moat, but TIER_LIMITS meters the transform and gives push/email reminders away
+  free and unlimited. Open question whether persistent re-surfacing should move to
+  PRO — it improves the pricing story but weakens a free tier we want to be better
+  than the competitor's. Unresolved; this is a positioning call.
 - **Name.** `getbraindump.com` already ships "Brain Dump: AI Notes & Writing" on
   the App Store. "Brain dump" is descriptive and therefore a weak trademark, so
   the real exposure is SEO and App Store confusion rather than legal. `mind-dump`
