@@ -9,7 +9,7 @@ export default {
         ink: '#1A1614',
         muted: '#6B625C',
         rule: '#E5DDD2',
-        clay: '#C0532F',
+        clay: '#A8501A',
         claySoft: '#F6E7DF',
         sage: '#4A6B5C',
       },
