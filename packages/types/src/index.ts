@@ -28,8 +28,19 @@ export interface User {
   tier: Tier;
   /** IANA zone, e.g. 'America/New_York'. Required to schedule reminders sanely. */
   timezone: string;
-  /** PRO only. The dedicated inbound number, E.164. Null on FREE. */
-  smsNumber: string | null;
+  /**
+   * The user's OWN phone number, E.164 — NOT a number we rent for them.
+   * Inbound SMS/iMessage carries the sender's caller ID, so one shared number
+   * serves every user and this is how we recognize who texted. Null until the
+   * user opts into text capture.
+   */
+  phoneNumber: string | null;
+  /**
+   * Set once the user has proved they control `phoneNumber` via a one-time
+   * code. Inbound routing MUST ignore an unverified number — otherwise anyone
+   * who claims someone else's number receives that person's dumps.
+   */
+  phoneVerifiedAt: Date | null;
   createdAt: Date;
 }
 

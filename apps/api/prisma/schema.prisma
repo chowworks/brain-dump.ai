@@ -54,15 +54,21 @@ enum ReminderStatus {
 }
 
 model User {
-  id        String   @id @default(cuid())
-  clerkId   String   @unique
-  email     String   @unique
-  tier      Tier     @default(FREE)
-  timezone  String   @default("America/New_York")
-  // PRO only. Dedicated inbound long code, E.164. Costs us rent per month,
-  // so it is never provisioned for FREE users.
-  smsNumber String?  @unique
-  createdAt DateTime @default(now())
+  id              String    @id @default(cuid())
+  clerkId         String    @unique
+  email           String    @unique
+  tier            Tier      @default(FREE)
+  timezone        String    @default("America/New_York")
+  // The user's OWN phone number, E.164 — not one we rent for them. Inbound
+  // messages carry the sender's caller ID, so one shared number serves every
+  // user and this is how we recognize who texted. @unique stops two accounts
+  // claiming the same phone.
+  phoneNumber     String?   @unique
+  // Set once the user proves they control phoneNumber. Inbound routing must
+  // ignore an unverified number, or anyone claiming someone else's number
+  // receives their dumps.
+  phoneVerifiedAt DateTime?
+  createdAt       DateTime  @default(now())
 
   dumps     Dump[]
   tasks     Task[]

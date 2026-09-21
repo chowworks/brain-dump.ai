@@ -80,13 +80,18 @@ Do not re-litigate these without new sources.
 
 ## Open decisions
 
-- **Dedicated SMS number per user, or a shared pool?** `User.smsNumber` in
-  `packages/types` currently assumes one number per user — that is $10,000/month
-  in rental at 10k PRO users. Inbound SMS identifies the sender by caller ID, so
-  a pool sized to *throughput* rather than user count plausibly costs $50–100/month
-  instead. The only thing forcing more numbers is 10DLC per-campaign throughput
-  and daily volume caps, which nobody has looked up yet. **Resolve this before the
-  field reaches a migration.**
+- **Shared number, provisionally decided.** We store the user's OWN phone number
+  (`User.phoneNumber`) and recognize them by caller ID on one shared inbound
+  number, rather than renting a dedicated number per user. That is ~$0 instead of
+  ~$10,000/month at 10k PRO users. Taken "until we know more" — it is still open
+  in #5, because the only thing that would force a pool of numbers is 10DLC
+  per-campaign throughput and daily volume caps, which nobody has looked up yet,
+  and because shared routing is unproven on iMessage (see #3).
+  **Consequence: `phoneNumber` is user-supplied, so it needs one-time-code
+  verification before inbound routing trusts it.** `phoneVerifiedAt` exists for
+  that; routing MUST ignore an unverified number, or anyone who claims someone
+  else's number receives that person's dumps. The verification flow itself is
+  not built yet.
 - **MindChuk's actual price is unknown.** mindchuk.com is blocked by the egress
   proxy. Every argument about our subscription reads differently at $15 than at
   $79. Highest-value open lookup.
