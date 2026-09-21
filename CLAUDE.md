@@ -50,10 +50,19 @@ Do not re-litigate these without new sources.
 - **Anything that runs on a schedule costs money per user whether they engage or
   not.** Scheduled work must be gated on tier AND recent activity AND capped
   input, and must use the Batch API (50% off, no latency requirement).
-- **A2P 10DLC is mandatory and provider-independent.** US carriers have blocked
-  100% of unregistered 10DLC traffic since Feb 2025 (The Campaign Registry).
-  ~5–7 business days to approve; registering EIN must be ≥15 days old. Switching
-  vendors does not avoid this. It gates any SMS launch date.
+- **A2P 10DLC is mandatory for any traffic that touches carrier SMS, and is
+  provider-independent.** US carriers have blocked 100% of unregistered 10DLC
+  traffic since Feb 2025 (The Campaign Registry). ~5–7 business days to approve;
+  registering EIN must be ≥15 days old. It gates any carrier-SMS launch date.
+  Native iMessage does *not* need it — but an iMessage provider's RCS/SMS
+  fallback leg runs on our registration, so a fallback chain does not avoid it,
+  it only narrows it to the Android slice.
+- **Outbound is the volume multiplier, not inbound.** Reminders run ~100
+  messages/user/month; capture runs ~30 dumps/user/month and only from paying
+  users. So outbound is where per-message pricing compounds and must stay on
+  push + email (~$0 marginal, no ceiling, every device). Inbound is low enough
+  volume that a flat-rate messaging vendor can make sense. Treat iMessage as a
+  *capture* channel, not a delivery channel.
 
 ## Open decisions
 
@@ -72,10 +81,23 @@ Do not re-litigate these without new sources.
   free and unlimited. Open question whether persistent re-surfacing should move to
   PRO — it improves the pricing story but weakens a free tier we want to be better
   than the competitor's. Unresolved; this is a positioning call.
-- **Name.** `getbraindump.com` already ships "Brain Dump: AI Notes & Writing" on
-  the App Store. "Brain dump" is descriptive and therefore a weak trademark, so
-  the real exposure is SEO and App Store confusion rather than legal. `mind-dump`
-  is the fallback. Needs a USPTO TESS search in classes 9 and 42 — unresolved.
+- **Name.** `getbraindump.com` already ships "Brain Dump: AI Notes & Writing".
+  We are building a website, not a mobile app, so store confusion is not the
+  mechanism — the exposure is (a) SEO, since their App Store page ranks in Google
+  for our brand terms, and (b) trademark, since Class 42 covers SaaS and websites
+  regardless of how we distribute. "Brain dump" is descriptive and therefore a
+  weak mark. `mind-dump` is the fallback. Needs a USPTO TESS search in classes 9
+  and 42 — unresolved.
+- **Messaging vendor.** Linq does iMessage + RCS + SMS fallback through one API.
+  Hobby is $0/mo but capped at **20 contacts** — a development tier, good for
+  building and testing the integration at no cost, not something users can be
+  served on. Pro is "Starting at $289/mo", and "starting at" is doing real work
+  in that sentence: a genuinely volume-independent plan would say unlimited, and
+  iMessage throughput is capped by Apple's per-account rate limits, which is a
+  physical ceiling rather than a commercial one. Unresolved: whether $289 is per
+  line or per account, what volume it covers, the overage rate, and whether
+  inbound-only avoids 10DLC. Evaluate in their free sandbox before committing.
+  Decision for now: **build against Hobby, keep outbound on push + email.**
 
 ## Stack
 
