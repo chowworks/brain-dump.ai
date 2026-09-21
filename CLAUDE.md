@@ -62,6 +62,15 @@ Do not re-litigate these without new sources.
   Native iMessage does *not* need it — but an iMessage provider's RCS/SMS
   fallback leg runs on our registration, so a fallback chain does not avoid it,
   it only narrows it to the Android slice.
+- **Never route reminders through the iMessage vendor.** This is a contract
+  constraint, not a preference. Sendblue's ~$100/month AI Agent plan is
+  *inbound-first*; proactive outbound moves you to their unpriced "Blue Ocean"
+  plan, quoted by sales. A reply inside a conversation the user just started
+  ("got it, saved") is fine — a reminder three days later is proactive by
+  definition and is exactly what the cheap plan excludes. So a ticket that says
+  "send reminders over iMessage, it's nicer" is a vendor contract change wearing
+  a feature's clothes, and it goes to the founder, never into a sprint. Reminders
+  ride push + email.
 - **Outbound is the volume multiplier, not inbound.** Reminders run ~100
   messages/user/month; capture runs ~30 dumps/user/month and only from paying
   users. So outbound is where per-message pricing compounds and must stay on
