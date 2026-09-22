@@ -147,6 +147,16 @@ export interface TierLimits {
   maxDumpChars: number;
   /** Cross-dump reasoning: insights, patterns, the scheduled digest. */
   aiReasoning: boolean;
+  /**
+   * The nag that escalates: an unacknowledged reminder comes back rather than
+   * being sent once and forgotten. PRO — not because push costs anything (it
+   * does not) but because repeated email at volume is a real bill and, more
+   * importantly, high-frequency sending from a young domain is what gets a
+   * sender marked as spam. That reputation is shared, so unlimited nagging on
+   * FREE would degrade delivery for everyone, including the plain reminders the
+   * free tier depends on.
+   */
+  persistentResurfacing: boolean;
   /** Agentic execution — the AI completes the task. Needs its own meter (#14). */
   taskExecution: boolean;
   channels: ReminderChannel[];
@@ -159,6 +169,7 @@ export const TIER_LIMITS: Record<Tier, TierLimits> = {
     transformsPerMonth: null,
     maxDumpChars: 20_000,
     aiReasoning: false,
+    persistentResurfacing: false,
     taskExecution: false,
     channels: ['PUSH', 'EMAIL'],
     mcpConnectors: false,
@@ -168,6 +179,7 @@ export const TIER_LIMITS: Record<Tier, TierLimits> = {
     transformsPerMonth: null,
     maxDumpChars: 100_000,
     aiReasoning: true,
+    persistentResurfacing: true,
     taskExecution: true,
     channels: ['PUSH', 'EMAIL', 'SMS'],
     mcpConnectors: true,
