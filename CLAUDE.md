@@ -105,18 +105,24 @@ Do not re-litigate these without new sources.
   **getbraindump.com is the more dangerous competitor, and we under-rated it.**
   "Dump your brain. Clear your mind. / The ADHD brain dump app that finally gets
   it." They target ADHD *explicitly and by name*. **Free forever. No account, no
-  credit card.** 10,000+ users, 4.8 App Store rating across 208 ratings.
+  credit card.** 4.8 App Store rating across 208 ratings.
+
+  Their site claims "10,000+ users" — **that is downloads, not customers. The
+  real number is roughly 300 paying users** (founder's own information). Useful
+  twice over: the threat is far smaller than the headline implies, and it tells
+  us free-to-paid conversion in this category is thin, so a free tier earns its
+  keep through funnel volume, not through converting well.
 
   **Their tier model is nearly identical to ours** — free with a limited monthly
   AI allowance, paid "Focus" plan for unlimited AI. We are not differentiated on
-  pricing structure at all, and they got there first with 10k users.
+  pricing structure at all, and they got there first.
 
   **The gap: they are Apple-only** — Mac, iPhone, iPad, Vision Pro. No web, no
   Android. And they are a *notes app with AI query* ("what did I write about…?"),
   which is retrieval you initiate. Neither of them has the outbound loop. That
   remains the differentiation, and it is now the *only* one — so a plan that
   waters it down (see the open meter question) removes the last thing separating
-  us from an incumbent with a free tier and 10,000 users.
+  us from an incumbent with a free tier and a head start.
 - **The meter may be on the wrong thing.** CLAUDE.md calls the outbound loop the
   moat, but TIER_LIMITS meters the transform and gives push/email reminders away
   free and unlimited. Open question whether persistent re-surfacing should move to

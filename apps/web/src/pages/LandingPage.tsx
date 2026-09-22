@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import RotatingPhrase from '../components/RotatingPhrase';
 
 /**
  * The landing page's whole job is to show the transformation rather than
@@ -88,10 +89,20 @@ function Hero() {
           <p className="mb-5 inline-block rounded-full bg-claySoft px-3 py-1 text-xs font-medium tracking-wide text-clay">
             Built for brains that won&apos;t hold still
           </p>
-          <h1 className="font-display text-5xl leading-[1.05] tracking-tight md:text-6xl">
+          <h1 className="font-display text-5xl leading-[1.15] tracking-tight md:text-6xl">
             Get it out of your head.
             <br />
-            <span className="italic text-clay">We&apos;ll bring it back.</span>
+            <span className="italic text-clay">
+              We&apos;ll bring it back{' '}
+              <RotatingPhrase
+                phrases={[
+                  'on Thursday morning.',
+                  'right before dinner.',
+                  'when you can act on it.',
+                  'the moment it matters.',
+                ]}
+              />
+            </span>
           </h1>
           <p className="mt-6 max-w-md text-lg leading-relaxed text-muted">
             Dump the whole tangled mess in one go — no title, no folder, no tidying up.
