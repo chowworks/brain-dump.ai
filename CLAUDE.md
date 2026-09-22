@@ -290,17 +290,6 @@ They never block opening one.
 
 Backend-only changes don't need screenshots — don't invent a UI to photograph.
 
-**Do not commit iterative design screenshots.** Only the final evidence that
-closes a ticket belongs in the repo. Design iterations get sent to the founder
-in chat and left in the scratchpad. The reason is that git keeps every version
-of a binary forever: rewriting `landing-full.png` six times during one design
-session put ~10 MB into branch history for three screenshots' worth of final
-value. A PR carrying design churn as blobs is also unreviewable — nobody diffs
-a PNG.
-
-If a branch has already accumulated them, **squash-merge it**: the blobs never
-reach `beta` or `main`.
-
 # How we work
 
 The company-wide development and decision standards are deliberately NOT applied
