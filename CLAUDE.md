@@ -240,8 +240,33 @@ Turborepo + npm workspaces, Node ≥22. Mirrors `ludakhris/interview-differently
 - `apps/api` — NestJS 10, Prisma 5, Postgres, Clerk backend, Anthropic SDK, Resend
 - `packages/types` — shared domain types and `TIER_LIMITS`
 
-`docker compose up -d postgres` for local DB. Dev servers via `.claude/launch.json`
-(web 5173, api 3000).
+Dev servers via `.claude/launch.json` (web 5173, api 3000).
+
+## Infrastructure
+
+**Railway hosts everything — API and Postgres, in separate projects per
+environment.** No Docker: it is not installed on the founder's machine and
+nothing here needs it, so `docker-compose.yml` was removed rather than left as a
+path nobody can run.
+
+Three Postgres databases, and they must be genuinely separate:
+
+- **dev** — what `DATABASE_URL` points at locally
+- **beta** — its own Railway project
+- **prod** — its own Railway project
+
+The separation is not tidiness. `prisma migrate dev` offers to **drop and
+recreate** the database whenever it detects schema drift; that is the normal
+local workflow and it is catastrophic pointed at a shared environment. Combined
+with `Dump` being append-only — junk written into a shared table cannot be
+cleaned up without violating the invariant — a shared database is the one
+mistake here with no recovery.
+
+Railway was chosen over Neon because it hosts the API too, and the founder
+already runs it on another project. What that trades away is Neon's database
+branching; the substitute is simply a third database. If the Postgres line on
+the bill becomes irritating, moving the databases to Neon's free tier is a
+connection-string change, not a migration.
 
 ## Branches
 
