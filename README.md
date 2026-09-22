@@ -31,11 +31,13 @@ Turborepo + npm workspaces, Node >= 22.
 
 ```bash
 npm install
-docker compose up -d postgres
 cp apps/api/.env.example apps/api/.env   # fill in keys
 cp apps/web/.env.example apps/web/.env
 npm run dev
 ```
+
+`DATABASE_URL` points at a **Railway Postgres** — the dev database, which is
+separate from beta and production. There is no local Postgres and no Docker.
 
 Web on http://localhost:5173, API on http://localhost:3000.
 

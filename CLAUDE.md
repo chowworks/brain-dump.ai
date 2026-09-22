@@ -240,8 +240,46 @@ Turborepo + npm workspaces, Node ≥22. Mirrors `ludakhris/interview-differently
 - `apps/api` — NestJS 10, Prisma 5, Postgres, Clerk backend, Anthropic SDK, Resend
 - `packages/types` — shared domain types and `TIER_LIMITS`
 
-`docker compose up -d postgres` for local DB. Dev servers via `.claude/launch.json`
-(web 5173, api 3000).
+Dev servers via `.claude/launch.json` (web 5173, api 3000).
+
+## Infrastructure
+
+**Railway hosts everything — API and Postgres, in separate projects per
+environment.** No Docker: it is not installed on the founder's machine and
+nothing here needs it, so `docker-compose.yml` was removed rather than left as a
+path nobody can run.
+
+Three Railway projects, one per environment, each with its own Postgres:
+
+- **`mind-dump-dev`** — Postgres only, no API service. This is what
+  `DATABASE_URL` points at locally.
+- **`mind-dump-beta`** — API service + Postgres
+- **`mind-dump-prod`** — API service + Postgres
+
+**Separate projects, not separate environments inside one project.** Railway's
+"environment promotion" is a Pro-plan ($20/seat/month) feature, and we do not
+need it: promotion here happens in git — `beta` merges into `main`, and each
+Railway project watches its own branch. The paid feature copies service config
+between environments, which is exactly the coupling we want to avoid when beta
+is supposed to be able to drift from prod.
+
+The separation is not tidiness. `prisma migrate dev` offers to **drop and
+recreate** the database whenever it detects schema drift; that is the normal
+local workflow and it is catastrophic pointed at a shared environment. Combined
+with `Dump` being append-only — junk written into a shared table cannot be
+cleaned up without violating the invariant — a shared database is the one
+mistake here with no recovery.
+
+Railway was chosen over Neon because it hosts the API too, and the founder
+already runs it on another project. What that trades away is Neon's database
+branching; the substitute is simply a third database.
+
+**The cost of that substitute is real and should be watched.** Railway Hobby is
+$5/month including $5 of usage credit; a Postgres service that never sleeps runs
+roughly $5/month on its own, so three databases plus two API services will
+exceed the credit and bill as overage. `mind-dump-dev` is the one to move first
+if that line gets irritating — Neon's free tier holds a dev database at $0 and
+switching it is a connection-string change, not a migration.
 
 ## Branches
 
