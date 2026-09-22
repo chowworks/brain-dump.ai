@@ -129,7 +129,7 @@ function Hero() {
 
           <div className="relative my-4 flex items-center justify-center">
             <div className="h-px flex-1 bg-rule" />
-            <span className="px-3 text-xs tracking-widest text-muted">SORTED</span>
+            <span className="px-3 text-xs tracking-widest text-muted">UNTANGLED</span>
             <div className="h-px flex-1 bg-rule" />
           </div>
 
@@ -227,11 +227,11 @@ function FeatureList({ items, dot }: { items: Feature[]; dot: string }) {
 const FREE: Feature[] = [
   { label: 'Unlimited dumps, forever', note: 'We never ration capture. Not now, not later.' },
   {
-    label: 'We sort every one of them',
-    note: 'No monthly allowance, no counter. Each comes back as tasks, with the dates pulled out of your own words.',
+    label: 'We untangle every one of them',
+    note: 'Typos tidied, tasks pulled out, dates found, tags added, reminders set. No allowance, no counter.',
   },
   { label: 'Reminders by push and email', note: 'The loop, in full. Not a trial of it.' },
-  { label: 'Search everything you ever wrote', note: 'Including the dumps you never sorted.' },
+  { label: 'Search everything you ever wrote', note: 'Including the half-finished ones you never came back to.' },
 ];
 
 const PRO: Feature[] = [
@@ -253,7 +253,7 @@ function Pricing() {
     <section id="pricing" className="mx-auto max-w-6xl px-6 py-20">
       <h2 className="font-display text-4xl tracking-tight">Free is actually free.</h2>
       <p className="mt-3 max-w-xl leading-relaxed text-muted">
-        Free gets the whole loop — dump it, we sort it, it comes back. You pay when you want it
+        Free gets the whole loop — dump it, we untangle it, it comes back. You pay when you want it
         working while you are not: thinking across everything you have written, and going off and
         doing the thing instead of reminding you to.
       </p>
@@ -264,8 +264,9 @@ function Pricing() {
           <p className="mt-1 text-sm text-muted">Everything you need to stop losing things.</p>
           <FeatureList items={FREE} dot="bg-sage" />
           <p className="mt-6 border-t border-rule pt-4 text-xs leading-relaxed text-muted">
-            The AI sorts your dump and dates it. It does not go and <em>do</em> it, and it does not
-            reason across everything you have written — those are Pro.
+            The AI untangles your dump — cleans it up, pulls out the tasks, finds the dates, tags
+            it. It does not go and <em>do</em> any of it, and it does not reason across everything
+            you have ever written. Those are Pro.
           </p>
         </div>
 
