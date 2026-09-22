@@ -6,6 +6,8 @@ insights that come back to you.
 Built for people with ADHD: capture takes under two seconds and asks you for
 nothing — no title, no folder, no category.
 
+![The landing page: a late-night scrawl above the same thoughts turned into dated tasks](docs/readme-hero.png)
+
 > **Both domains are ours and both stay in use.** `mind-dump.com` is the primary
 > — it is what people type by reflex and what the app is served from.
 > `brain-dump.ai` is kept for the stronger keyword and the links pointing at it,
