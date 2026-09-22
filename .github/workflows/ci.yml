@@ -1,0 +1,29 @@
+name: CI
+
+# Two protected branches:
+#   main — production
+#   beta — the real test system, promoted from main before a prod release
+on:
+  push:
+    branches: [main, beta]
+  pull_request:
+    branches: [main, beta]
+
+jobs:
+  ci:
+    name: Lint, Typecheck, Build, Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm install
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm run build
+      - run: npm run test
+
+  # Deploy jobs are deliberately absent until #7 provisions the targets and #24
+  # wires them. Adding them before the environments exist would give a red CI on
+  # every push to a branch that is otherwise fine.

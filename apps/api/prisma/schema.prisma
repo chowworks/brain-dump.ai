@@ -1,0 +1,171 @@
+// brain-dump schema.
+//
+// Design note: Dump is append-only. Transform, Task, Reminder and Insight all
+// hang off it. That separation is deliberate — the raw thought must survive
+// intact even if an AI pass is wrong, re-run, or rolled back to a new model.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Tier {
+  FREE
+  PRO
+}
+
+enum CaptureSource {
+  WEB
+  PWA_SHARE
+  EMAIL
+  SMS
+  VOICE
+}
+
+enum ReminderChannel {
+  PUSH
+  EMAIL
+  SMS
+}
+
+enum TransformStatus {
+  PENDING
+  RUNNING
+  COMPLETE
+  FAILED
+}
+
+enum TaskStatus {
+  OPEN
+  DONE
+  DISMISSED
+}
+
+enum ReminderStatus {
+  SCHEDULED
+  SENT
+  ACKED
+  CANCELLED
+  FAILED
+}
+
+model User {
+  id              String    @id @default(cuid())
+  clerkId         String    @unique
+  email           String    @unique
+  tier            Tier      @default(FREE)
+  timezone        String    @default("America/New_York")
+  // The user's OWN phone number, E.164 — not one we rent for them. Inbound
+  // messages carry the sender's caller ID, so one shared number serves every
+  // user and this is how we recognize who texted. @unique stops two accounts
+  // claiming the same phone.
+  phoneNumber     String?   @unique
+  // Set once the user proves they control phoneNumber. Inbound routing must
+  // ignore an unverified number, or anyone claiming someone else's number
+  // receives their dumps.
+  phoneVerifiedAt DateTime?
+  createdAt       DateTime  @default(now())
+
+  dumps     Dump[]
+  tasks     Task[]
+  reminders Reminder[]
+  tags      Tag[]
+  insights  Insight[]
+}
+
+model Dump {
+  id         String        @id @default(cuid())
+  userId     String
+  body       String
+  source     CaptureSource
+  capturedAt DateTime      @default(now())
+
+  user       User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transforms Transform[]
+  tasks      Task[]
+  reminders  Reminder[]
+  tags       Tag[]       @relation("DumpTags")
+
+  // The feed is "my dumps, newest first" on every single page load.
+  @@index([userId, capturedAt])
+}
+
+model Transform {
+  id           String          @id @default(cuid())
+  dumpId       String
+  status       TransformStatus @default(PENDING)
+  model        String
+  inputTokens  Int?
+  outputTokens Int?
+  error        String?
+  createdAt    DateTime        @default(now())
+  completedAt  DateTime?
+
+  dump Dump @relation(fields: [dumpId], references: [id], onDelete: Cascade)
+
+  @@index([dumpId])
+  // Monthly quota check counts COMPLETE transforms in a window.
+  @@index([status, createdAt])
+}
+
+model Task {
+  id        String     @id @default(cuid())
+  dumpId    String
+  userId    String
+  title     String
+  dueAt     DateTime?
+  status    TaskStatus @default(OPEN)
+  createdAt DateTime   @default(now())
+
+  dump      Dump       @relation(fields: [dumpId], references: [id], onDelete: Cascade)
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  reminders Reminder[]
+
+  @@index([userId, status, dueAt])
+}
+
+model Reminder {
+  id           String          @id @default(cuid())
+  userId       String
+  taskId       String?
+  dumpId       String?
+  channel      ReminderChannel
+  scheduledFor DateTime
+  sentAt       DateTime?
+  status       ReminderStatus  @default(SCHEDULED)
+
+  user User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  task Task? @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  dump Dump? @relation(fields: [dumpId], references: [id], onDelete: Cascade)
+
+  // The dispatcher polls this constantly: "what is due and still SCHEDULED".
+  @@index([status, scheduledFor])
+  @@index([userId])
+}
+
+model Tag {
+  id     String @id @default(cuid())
+  userId String
+  name   String
+
+  user  User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  dumps Dump[] @relation("DumpTags")
+
+  @@unique([userId, name])
+}
+
+model Insight {
+  id            String   @id @default(cuid())
+  userId        String
+  body          String
+  sourceDumpIds String[]
+  createdAt     DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+}

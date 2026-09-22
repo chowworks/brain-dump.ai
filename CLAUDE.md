@@ -1,0 +1,306 @@
+# Project memory — brain-dump
+
+## What this is
+
+A capture tool for people with ADHD. Dump a thought fast, and AI turns it into
+tasks, reminders and insights that come *back* to you.
+
+**The moat is the outbound loop, not the capture and not the transform.** Anyone
+can text themselves a note. Nothing they can do for free will nag them about it
+three days later, in their timezone, on the right channel. Every scoping
+decision resolves toward that loop.
+
+Competitor: MindChuk (text a number, feed, search, tags, one-time payment). We
+are strictly downstream of it — we take the dump and make it actionable.
+
+## Business model
+
+Source of truth for limits is `TIER_LIMITS` in `packages/types/src/index.ts`.
+Change it there, never hardcode a quota.
+
+| | FREE | PRO (monthly) |
+|---|---|---|
+| Dumps | unlimited | unlimited |
+| AI **extraction** (dump → tasks) | unlimited | unlimited |
+| AI **reasoning** (insights, digest) | — | yes |
+| AI **task execution** (does the task) | — | yes |
+| Reminder channels | push, email | push, email, **SMS** |
+| MCP connectors | no | yes |
+
+**The AI splits three ways and they are priced differently on purpose.**
+
+*Extraction* turns one dump into tasks, dates and tags — one bounded call,
+~$0.003 on Haiku. **Free and uncapped on both tiers.** A counter on the core
+experience makes the product something you hesitate to use, which is the one
+thing a capture tool cannot survive. getbraindump caps AI on their free tier, so
+not capping it is a concrete way ours is better rather than equivalent. PRO does
+not need extraction to carry monetization now that reasoning, execution, SMS and
+MCP do.
+
+**The cap that replaced it is `maxDumpChars`, and it matters more than the count
+ever did.** Spend tracks *input size*, not button presses: one pasted
+50,000-word document is a single transform costing ~100x a normal one. 20k chars
+on FREE, 100k on PRO. `transformsPerMonth` is kept in the type as null on both
+tiers so an abuse ceiling can be set later without a schema change — that would
+be fraud control, not monetization, and the two must not be conflated.
+
+**Still owed:** a per-user rate limit on the transform endpoint. Uncapped free AI
+is an obvious target for scripted abuse, and a rate limit is the right tool for
+that — not a product cap.
+
+*Reasoning* and *execution* are PRO. Both are the product working while the user
+is not looking, which is what recurring money should buy, and both cost per user
+whether they engage or not — reasoning because it runs on a schedule, execution
+because an agentic run has no fixed ceiling (#14).
+
+Capture itself is never rationed. SMS is a tier wall because it is the only
+*channel* with real per-user marginal cost.
+
+We charge monthly where MindChuk charges once. That is only defensible because
+our costs recur. Every PRO feature must strengthen that answer.
+
+## Verified cost constraints
+
+Do not re-litigate these without new sources.
+
+- **Telnyx all-in ≈ $0.008 per message part**, not $0.004. The $0.004 is the base
+  rate; US carriers add a surcharge per part (T-Mobile $0.003, AT&T $0.0035,
+  Verizon $0.0045). Telnyx still beats Twilio, which passes through the same
+  surcharges on a higher base — but budget $0.008, not $0.004.
+- SMS long code rental: **$1.00/month per number**. A free user can never have a
+  dedicated number.
+- **Sendblue is NOT disqualified — that call was based on a wrong assumption.**
+  It was ruled out at $100/line/month on the assumption that lines scale with
+  users. Under an inbound-only design where one shared number serves everyone via
+  caller-ID routing, $100/month is flat. Their "AI Agent" plan is inbound-first,
+  which is a limitation for sales teams and exactly what we want. See the
+  messaging vendor entry under Open decisions.
+- **Transform cost is dominated by model choice, not by the quota.** Haiku 4.5
+  ≈ $0.003/transform vs Opus 5 ≈ $0.020 — 6.5x for the same structured
+  extraction job. Pin the transform to Haiku and keep the model a config value.
+  `Transform.model` exists so this can be measured per model.
+- **Anything that runs on a schedule costs money per user whether they engage or
+  not.** Scheduled work must be gated on tier AND recent activity AND capped
+  input, and must use the Batch API (50% off, no latency requirement).
+- **A2P 10DLC is mandatory for any traffic that touches carrier SMS, and is
+  provider-independent.** US carriers have blocked 100% of unregistered 10DLC
+  traffic since Feb 2025 (The Campaign Registry). ~5–7 business days to approve. The
+  15-day EIN-age rule is **not** a blocker here — the founder's EIN is well
+  established, so registration can be filed immediately and the whole lead time
+  is the carrier approval itself.
+  Native iMessage does *not* need it — but an iMessage provider's RCS/SMS
+  fallback leg runs on our registration, so a fallback chain does not avoid it,
+  it only narrows it to the Android slice.
+- **Do not route reminders through the iMessage vendor — for now.** This was
+  previously written as an absolute "never", which overstated it. Two separate
+  reasons, one conditional and one structural:
+
+  *Conditional (commercial).* Sendblue's ~$100/month AI Agent plan is
+  **inbound-first**: an in-conversation reply ("got it, saved") is fine, but a
+  reminder three days later is proactive by definition and pushes you onto their
+  unpriced "Blue Ocean" plan, quoted by sales. **Linq's $289 plan may permit
+  outbound — nobody has checked.** That is an open question in #3, so this
+  constraint lifts if Linq allows proactive sending at a flat price.
+
+  *Structural (physical).* Apple rate-limits iMessage per account. Outbound runs
+  ~100 messages/user/month, so at any real scale you hit a throughput ceiling no
+  plan can buy past. Push and email have no such ceiling. This reason does not
+  lift no matter what #3 finds, which is why reminders default to push + email
+  and iMessage stays a *capture* channel.
+
+  A ticket proposing iMessage reminders is still a vendor contract change rather
+  than a feature, so it goes to the founder — but the answer is "pending #3",
+  not a flat no.
+- **Outbound is the volume multiplier, not inbound.** Reminders run ~100
+  messages/user/month; capture runs ~30 dumps/user/month and only from paying
+  users. So outbound is where per-message pricing compounds and must stay on
+  push + email (~$0 marginal, no ceiling, every device). Inbound is low enough
+  volume that a flat-rate messaging vendor can make sense. Treat iMessage as a
+  *capture* channel, not a delivery channel.
+
+## Open decisions
+
+- **Shared number, provisionally decided.** We store the user's OWN phone number
+  (`User.phoneNumber`) and recognize them by caller ID on one shared inbound
+  number, rather than renting a dedicated number per user. That is ~$0 instead of
+  ~$10,000/month at 10k PRO users. Taken "until we know more" — it is still open
+  in #5, because the only thing that would force a pool of numbers is 10DLC
+  per-campaign throughput and daily volume caps, which nobody has looked up yet,
+  and because shared routing is unproven on iMessage (see #3).
+  **Consequence: `phoneNumber` is user-supplied, so it needs one-time-code
+  verification before inbound routing trusts it.** `phoneVerifiedAt` exists for
+  that; routing MUST ignore an unverified number, or anyone who claims someone
+  else's number receives that person's dumps. The verification flow itself is
+  not built yet.
+- **Competitors, confirmed by visiting both sites (2026-09-21).**
+
+  **MindChuk — $55, one-time. "One-time payment. Yours forever."** Claims 100+
+  five-star reviews. Positioning: "The fastest way to get something out of your
+  head and into your own private searchable feed." At $12/month we pass $55 in
+  4.6 months, so the pitch can never be "cheaper" — it has to be worth $12 every
+  month on its own. Site is pure black with monospace body copy, everything
+  centered, a typing-cursor headline gimmick and a "Someone from Seattle just
+  purchased" widget.
+
+  **getbraindump.com is the more dangerous competitor, and we under-rated it.**
+  "Dump your brain. Clear your mind. / The ADHD brain dump app that finally gets
+  it." They target ADHD *explicitly and by name*. **Free forever. No account, no
+  credit card.** 4.8 App Store rating across 208 ratings.
+
+  Their site claims "10,000+ users" — **that is downloads, not customers. The
+  real number is roughly 300 paying users** (founder's own information). Useful
+  twice over: the threat is far smaller than the headline implies, and it tells
+  us free-to-paid conversion in this category is thin, so a free tier earns its
+  keep through funnel volume, not through converting well.
+
+  **Their tier model is nearly identical to ours** — free with a limited monthly
+  AI allowance, paid "Focus" plan for unlimited AI. We are not differentiated on
+  pricing structure at all, and they got there first.
+
+  **The gap: they are Apple-only** — Mac, iPhone, iPad, Vision Pro. No web, no
+  Android. And they are a *notes app with AI query* ("what did I write about…?"),
+  which is retrieval you initiate. Neither of them has the outbound loop. That
+  remains the differentiation, and it is now the *only* one — so a plan that
+  waters it down (see the open meter question) removes the last thing separating
+  us from an incumbent with a free tier and a head start.
+- **The meter may be on the wrong thing.** CLAUDE.md calls the outbound loop the
+  moat, but TIER_LIMITS meters the transform and gives push/email reminders away
+  free and unlimited. Open question whether persistent re-surfacing should move to
+  PRO — it improves the pricing story but weakens a free tier we want to be better
+  than the competitor's. Unresolved; this is a positioning call.
+- **Name: DECIDED — `mind-dump.com`, with `brain-dump.ai` forwarding to it.**
+  USPTO TESS turned up no "brain dump" mark, so the trademark objection that
+  drove this is gone. The decision came down to TLD, not to the words:
+
+  `.com` is what people type by reflex, costs ~$12/year against ~$70–100 for
+  `.ai`, and reads as trustworthy to a mainstream audience that is overwhelmed
+  rather than tech-forward. `brain-dump` is the stronger idiom, but the SEO
+  advantage assumed we could rank for it — and we cannot: `getbraindump.com`
+  holds the phrase, a `.com`, and an App Store listing that ranks in Google.
+  Paying the `.ai` premium for a keyword we cannot cash made no sense.
+  `brain-dump.ai` is kept and forwarded so the keyword and any existing links
+  are not thrown away.
+
+  Both domains are registered. `minddump.com` unhyphenated was checked and is
+  taken, so the hyphenated form stands. **DNS is managed at Spaceship** — any
+  record work (Vercel, Resend DKIM/SPF, the `brain-dump.ai` 301) happens there.
+  The repo keeps the name `brain-dump.ai`; it is internal and does not need to
+  match the product domain.
+
+  **Accepted risk:** "mind dump" has lower search volume than "brain dump", and
+  both are descriptive phrases and therefore weak marks. We are not trying to own
+  the head term. Acquisition targets long-tail intent — "ADHD brain dump",
+  "brain dump reminders", "brain dump to actionable tasks" — where the outbound
+  loop is the differentiator and a plain notes app is not competing.
+- **Messaging vendor.** Linq does iMessage + RCS + SMS fallback through one API.
+  Hobby is $0/mo but capped at **20 contacts** — a development tier, good for
+  building and testing the integration at no cost, not something users can be
+  served on. Pro is "Starting at $289/mo", and "starting at" is doing real work
+  in that sentence: a genuinely volume-independent plan would say unlimited, and
+  iMessage throughput is capped by Apple's per-account rate limits, which is a
+  physical ceiling rather than a commercial one. Unresolved: whether $289 is per
+  line or per account, what volume it covers, the overage rate, and whether
+  inbound-only avoids 10DLC. Evaluate in their free sandbox before committing.
+  Decision for now: **build against Hobby, keep outbound on push + email.**
+
+  Sendblue is back in contention on the same inbound-only logic: its AI Agent
+  plan is ~$100/month with a dedicated number, iMessage + RCS + SMS fallback,
+  an MCP server, and SOC 2 — cheaper than Linq Pro if the number is shared.
+  **The deciding figure is its "up to 1,000 inbound contacts/day" cap:** if that
+  counts distinct contacts rather than messages, it is a hard ceiling on daily
+  active senders and breaks well before 10k users. Nobody has confirmed which.
+
+  **Treat vendor comparison tables as marketing, not data.** Sendblue's own
+  comparison page states Linq is "~$250/mo with $1,000+ setup and contact-sales
+  for a free tier"; Linq's actual pricing page shows $289/mo with a $0 Hobby tier
+  and no credit card required. A vendor that is wrong about the one competitor we
+  can verify is not a source for the ones we cannot. Confirm every number in a
+  free sandbox or directly with the vendor before it enters this file.
+
+## Stack
+
+Turborepo + npm workspaces, Node ≥22. Mirrors `ludakhris/interview-differently`.
+
+- `apps/web` — Vite, React 18, React Router 6, Tailwind 3, Clerk
+- `apps/api` — NestJS 10, Prisma 5, Postgres, Clerk backend, Anthropic SDK, Resend
+- `packages/types` — shared domain types and `TIER_LIMITS`
+
+`docker compose up -d postgres` for local DB. Dev servers via `.claude/launch.json`
+(web 5173, api 3000).
+
+## Branches
+
+Two protected branches, unlike `interview-differently` which ships straight from
+its default branch:
+
+- **`main` → production.** Nothing lands here that has not been through `beta`.
+- **`beta` → the beta app.** A real, deployed test system against real
+  infrastructure, not a local dev server.
+
+Flow: feature branch → PR into `beta` → soak on the beta app → promote `beta`
+into `main`. CI runs on pushes and PRs to both.
+
+The point of `beta` is the class of bug that only appears against real
+infrastructure — timezone-correct reminder scheduling (#18), inbound webhook
+routing (#22), Stripe, and email deliverability — none of which a local dev
+server exercises honestly.
+
+Branch protection rules are set in GitHub repo settings, not in this repo, so
+they are not version-controlled here. Both branches should require CI to pass
+before merge.
+
+## Schema invariant
+
+**`Dump` is append-only.** It holds the user's raw thought. Transforms, tasks,
+reminders and insights hang off it and may be re-run, corrected or discarded —
+the original text must survive all of it intact. Any code path that mutates or
+deletes a Dump is a defect until proven otherwise.
+
+## Agents
+
+`.claude/agents/` — invoke by name:
+
+- **biz-analyst** — rules on which tier a feature belongs to and what it costs
+  at 10k users. Consult *before* building, not after.
+- **code-reviewer** — reviews the diff for real defects before commit or PR.
+- **product-manager** — owns GitHub Issues, enforces definition of done.
+- **qa-tester** — drives the running app as a distracted user and reports breaks.
+
+## Workflow
+
+**Backlog lives in [GitHub Issues](https://github.com/chowworks/brain-dump.ai/issues), not files.**
+One issue per coherent feature, checklist inside for sub-tasks. Reference issues
+in commits with `Closes #N` (or `Refs #N` for partial work). Do not create a
+`TASKS.md` — file-based backlogs drift.
+
+## Screenshots on issues
+
+Screenshots are evidence that closes a ticket, captured **after** implementation.
+They never block opening one.
+
+1. Start dev servers via `.claude/launch.json`.
+2. Capture with Playwright. Chromium is preinstalled at `/opt/pw-browsers/chromium`
+   — **never run `playwright install`**.
+3. Save to `docs/screenshots/<feature>/NN-name.png`. Name folders after the
+   feature, never `phase1/`, `phaseN/`.
+4. Commit and push so images have a stable URL.
+5. Reference from the issue comment pinned to the **commit SHA**:
+   `https://raw.githubusercontent.com/chowworks/brain-dump.ai/<sha>/docs/screenshots/<feature>/NN-name.png`
+6. Update the issue's checklist.
+
+Backend-only changes don't need screenshots — don't invent a UI to photograph.
+
+# How we work
+
+The company-wide development and decision standards are deliberately NOT applied
+to this project — we are running it through agents instead. Three rules survive,
+and they exist so a bad change can be found and undone:
+
+1. **Every feature has a GitHub Issue.** Backlog lives in Issues, never a file.
+2. **Every UI feature closes with screenshots** committed to the repo and linked
+   from its issue by commit SHA (see above).
+3. **One commit per feature**, referencing its issue (`Closes #N` / `Refs #N`).
+   Commits stay feature-sized specifically so a single feature can be reverted
+   without unpicking unrelated work.
+
+Commits do not need approval before landing.
