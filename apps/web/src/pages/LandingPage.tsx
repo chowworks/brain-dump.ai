@@ -100,7 +100,7 @@ function Hero() {
                   'right before dinner.',
                   'when you can act on it.',
                   'the moment it matters.',
-                  'once it&rsquo;s broken into steps.',
+                  'once the AI has finished it.',
                 ]}
               />
             </span>
@@ -194,13 +194,13 @@ function FounderNote() {
           &ldquo;I have ADHD. Right now I have a million tabs open, every one of them an idea
           I&rsquo;m probably never coming back to.
           <span className="mt-4 block">
-            So I built the thing that comes back to <span className="italic text-clay">me</span>
-            &nbsp;instead. It works for me. That&rsquo;s the whole origin story.&rdquo;
+            So I built an app that comes back to{' '}
+            <span className="italic text-clay">me</span>, keeps{' '}
+            <span className="italic text-clay">me</span> organized, and works with{' '}
+            <span className="italic text-clay">me</span>.&rdquo;
           </span>
         </blockquote>
-        <p className="mt-6 text-sm text-muted">
-          Chris — building this in the open, one tab at a time.
-        </p>
+        <p className="mt-6 text-sm text-muted">Building this in the open, one tab at a time.</p>
       </div>
     </section>
   );
