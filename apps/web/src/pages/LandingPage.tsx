@@ -87,7 +87,7 @@ function Hero() {
       <div className="grid items-center gap-14 md:grid-cols-[1.05fr_1fr]">
         <div>
           <p className="mb-5 inline-block rounded-full bg-claySoft px-3 py-1 text-xs font-medium tracking-wide text-clay">
-            Built for brains that won&apos;t hold still
+            An ADHD tool, built by someone who needs it
           </p>
           <h1 className="font-display text-5xl leading-[1.15] tracking-tight md:text-6xl">
             Get it out of your head.
@@ -100,6 +100,7 @@ function Hero() {
                   'right before dinner.',
                   'when you can act on it.',
                   'the moment it matters.',
+                  'once it&rsquo;s broken into steps.',
                 ]}
               />
             </span>
@@ -184,6 +185,27 @@ function TheLoop() {
   );
 }
 
+function FounderNote() {
+  return (
+    <section className="mx-auto max-w-3xl px-6 py-20">
+      <div className="rounded-2xl border border-rule bg-card p-8 md:p-10">
+        <p className="mb-5 text-xs uppercase tracking-widest text-muted">Why this exists</p>
+        <blockquote className="font-display text-2xl leading-snug md:text-3xl">
+          &ldquo;I have ADHD. Right now I have a million tabs open, every one of them an idea
+          I&rsquo;m probably never coming back to.
+          <span className="mt-4 block">
+            So I built the thing that comes back to <span className="italic text-clay">me</span>
+            &nbsp;instead. It works for me. That&rsquo;s the whole origin story.&rdquo;
+          </span>
+        </blockquote>
+        <p className="mt-6 text-sm text-muted">
+          Chris — building this in the open, one tab at a time.
+        </p>
+      </div>
+    </section>
+  );
+}
+
 function Pricing() {
   return (
     <section id="pricing" className="mx-auto max-w-6xl px-6 py-20">
@@ -243,13 +265,14 @@ export default function LandingPage() {
       <Nav />
       <Hero />
       <TheLoop />
+      <FounderNote />
       <Pricing />
       <footer className="border-t border-rule">
         <div className="mx-auto flex max-w-6xl flex-col gap-2 px-6 py-8 text-sm text-muted sm:flex-row sm:items-center sm:justify-between">
           <span className="font-display text-lg text-ink">
             mind<span className="text-clay">-</span>dump
           </span>
-          <span>Made for people with too many tabs open. Both kinds.</span>
+          <span>Built in the open. Slowly, then all at once.</span>
         </div>
       </footer>
     </div>
