@@ -21,13 +21,27 @@ Change it there, never hardcode a quota.
 | | FREE | PRO (monthly) |
 |---|---|---|
 | Dumps | unlimited | unlimited |
-| AI transforms | 30/month | unlimited |
+| AI **extraction** (dump → tasks) | 30/month | unlimited |
+| AI **reasoning** (insights, digest) | — | yes |
+| AI **task execution** (does the task) | — | yes |
 | Reminder channels | push, email | push, email, **SMS** |
 | MCP connectors | no | yes |
 
-Rationale: capture is cheap to serve and is the habit we need, so it is never
-rationed. The transform is the meter and the conversion moment. SMS is the tier
-wall because it is the only channel with real per-user marginal cost.
+**The AI splits three ways and they are priced differently on purpose.**
+
+*Extraction* turns one dump into tasks, dates and tags — one bounded call,
+~$0.003 on Haiku. It stays free and metered because it is the taste: a user who
+has never watched their own mess become a list is being asked to pay for a
+promise they have not seen work. getbraindump's free tier includes an AI
+allowance; a free tier with none would lose that comparison outright.
+
+*Reasoning* and *execution* are PRO. Both are the product working while the user
+is not looking, which is what recurring money should buy, and both cost per user
+whether they engage or not — reasoning because it runs on a schedule, execution
+because an agentic run has no fixed ceiling (#14).
+
+Capture itself is never rationed. SMS is a tier wall because it is the only
+*channel* with real per-user marginal cost.
 
 We charge monthly where MindChuk charges once. That is only defensible because
 our costs recur. Every PRO feature must strengthen that answer.

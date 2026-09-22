@@ -106,12 +106,33 @@ export interface Insight {
   createdAt: Date;
 }
 
-/** Per-tier limits. Single source of truth — the API and the pricing page both read this. */
+/**
+ * Per-tier limits. Single source of truth — the API and the pricing page both
+ * read this.
+ *
+ * The AI splits three ways, and they are priced differently on purpose:
+ *
+ * - **Extraction** (`transformsPerMonth`) turns one dump into tasks, dates and
+ *   tags. One bounded model call, ~$0.003 on Haiku. Metered but free, because a
+ *   user who has never watched their own mess become a list is being asked to
+ *   pay for a promise they have not seen work.
+ * - **Reasoning** (`aiReasoning`) is cross-dump: patterns, insights, the weekly
+ *   digest. It runs on a schedule, so it costs per user whether they engage or
+ *   not. PRO.
+ * - **Execution** (`taskExecution`) is the AI doing the task rather than filing
+ *   it — a research question answered, not a reminder to go research it. Cost is
+ *   unbounded per run, so it does not belong on a per-transform meter at all.
+ *   PRO, and see #14 for the metering that still needs designing.
+ */
 export interface TierLimits {
   /** Null = unlimited. Capture is never the thing we ration. */
   dumpsPerMonth: number | null;
-  /** The real meter. */
+  /** Extraction only. The taste of the product, and the conversion moment. */
   transformsPerMonth: number | null;
+  /** Cross-dump reasoning: insights, patterns, the scheduled digest. */
+  aiReasoning: boolean;
+  /** Agentic execution — the AI completes the task. Needs its own meter (#14). */
+  taskExecution: boolean;
   channels: ReminderChannel[];
   mcpConnectors: boolean;
 }
@@ -120,12 +141,16 @@ export const TIER_LIMITS: Record<Tier, TierLimits> = {
   FREE: {
     dumpsPerMonth: null,
     transformsPerMonth: 30,
+    aiReasoning: false,
+    taskExecution: false,
     channels: ['PUSH', 'EMAIL'],
     mcpConnectors: false,
   },
   PRO: {
     dumpsPerMonth: null,
     transformsPerMonth: null,
+    aiReasoning: true,
+    taskExecution: true,
     channels: ['PUSH', 'EMAIL', 'SMS'],
     mcpConnectors: true,
   },

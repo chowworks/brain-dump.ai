@@ -243,6 +243,8 @@ function Pricing() {
           <ul className="mt-6 space-y-3 text-sm">
             {[
               'Unlimited AI sorts',
+              'It spots the patterns you keep circling',
+              'It does the task, not just the reminding',
               'Text your thoughts in from anywhere',
               "It keeps asking until it's done",
               'Connect it to Claude and other AI tools',
