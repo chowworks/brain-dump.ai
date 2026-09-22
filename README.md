@@ -1,4 +1,4 @@
-# mind-dump
+# mind-dump · brain-dump.ai
 
 Get the thought out of your head fast. AI untangles it into tasks, reminders and
 insights that come back to you.
@@ -6,8 +6,10 @@ insights that come back to you.
 Built for people with ADHD: capture takes under two seconds and asks you for
 nothing — no title, no folder, no category.
 
-> The product is **mind-dump.com**, with `brain-dump.ai` forwarding to it. The
-> repo keeps its original name; it is internal and does not need to match.
+> **Both domains are ours and both stay in use.** `mind-dump.com` is the primary
+> — it is what people type by reflex and what the app is served from.
+> `brain-dump.ai` is kept for the stronger keyword and the links pointing at it,
+> and currently forwards. The repo keeps its original name.
 
 ## Why this exists
 
