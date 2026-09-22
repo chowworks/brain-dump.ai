@@ -112,10 +112,18 @@ export interface Insight {
  *
  * The AI splits three ways, and they are priced differently on purpose:
  *
- * - **Extraction** (`transformsPerMonth`) turns one dump into tasks, dates and
- *   tags. One bounded model call, ~$0.003 on Haiku. Metered but free, because a
- *   user who has never watched their own mess become a list is being asked to
- *   pay for a promise they have not seen work.
+ * - **Extraction** turns one dump into tasks, dates and tags. One bounded model
+ *   call, ~$0.003 on Haiku. **Free and uncapped.** It is the core experience,
+ *   and a counter on it makes the product something you hesitate to use — which
+ *   is the one thing a capture tool cannot survive. The competitor caps AI on
+ *   their free tier; not capping it is a concrete way ours is better rather than
+ *   equivalent. PRO no longer needs extraction to carry monetization, because
+ *   reasoning, execution, SMS and MCP now do.
+ *
+ *   What replaces the cap is `maxDumpChars`, and it matters more than the count
+ *   ever did: cost scales with *input size*, not with how many times you press
+ *   the button. One pasted 50,000-word document is a single transform costing
+ *   ~100x a normal one. Cap the input, not the usage.
  * - **Reasoning** (`aiReasoning`) is cross-dump: patterns, insights, the weekly
  *   digest. It runs on a schedule, so it costs per user whether they engage or
  *   not. PRO.
@@ -127,8 +135,16 @@ export interface Insight {
 export interface TierLimits {
   /** Null = unlimited. Capture is never the thing we ration. */
   dumpsPerMonth: number | null;
-  /** Extraction only. The taste of the product, and the conversion moment. */
+  /**
+   * Extraction runs. Null on both tiers — see the note above. Kept as a field
+   * rather than deleted so an abuse ceiling can be set without a schema change.
+   */
   transformsPerMonth: number | null;
+  /**
+   * Max characters accepted in a single dump. This is the real cost control now
+   * that the run count is uncapped, because spend tracks input size.
+   */
+  maxDumpChars: number;
   /** Cross-dump reasoning: insights, patterns, the scheduled digest. */
   aiReasoning: boolean;
   /** Agentic execution — the AI completes the task. Needs its own meter (#14). */
@@ -140,7 +156,8 @@ export interface TierLimits {
 export const TIER_LIMITS: Record<Tier, TierLimits> = {
   FREE: {
     dumpsPerMonth: null,
-    transformsPerMonth: 30,
+    transformsPerMonth: null,
+    maxDumpChars: 20_000,
     aiReasoning: false,
     taskExecution: false,
     channels: ['PUSH', 'EMAIL'],
@@ -149,6 +166,7 @@ export const TIER_LIMITS: Record<Tier, TierLimits> = {
   PRO: {
     dumpsPerMonth: null,
     transformsPerMonth: null,
+    maxDumpChars: 100_000,
     aiReasoning: true,
     taskExecution: true,
     channels: ['PUSH', 'EMAIL', 'SMS'],

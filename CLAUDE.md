@@ -21,7 +21,7 @@ Change it there, never hardcode a quota.
 | | FREE | PRO (monthly) |
 |---|---|---|
 | Dumps | unlimited | unlimited |
-| AI **extraction** (dump → tasks) | 30/month | unlimited |
+| AI **extraction** (dump → tasks) | unlimited | unlimited |
 | AI **reasoning** (insights, digest) | — | yes |
 | AI **task execution** (does the task) | — | yes |
 | Reminder channels | push, email | push, email, **SMS** |
@@ -30,10 +30,23 @@ Change it there, never hardcode a quota.
 **The AI splits three ways and they are priced differently on purpose.**
 
 *Extraction* turns one dump into tasks, dates and tags — one bounded call,
-~$0.003 on Haiku. It stays free and metered because it is the taste: a user who
-has never watched their own mess become a list is being asked to pay for a
-promise they have not seen work. getbraindump's free tier includes an AI
-allowance; a free tier with none would lose that comparison outright.
+~$0.003 on Haiku. **Free and uncapped on both tiers.** A counter on the core
+experience makes the product something you hesitate to use, which is the one
+thing a capture tool cannot survive. getbraindump caps AI on their free tier, so
+not capping it is a concrete way ours is better rather than equivalent. PRO does
+not need extraction to carry monetization now that reasoning, execution, SMS and
+MCP do.
+
+**The cap that replaced it is `maxDumpChars`, and it matters more than the count
+ever did.** Spend tracks *input size*, not button presses: one pasted
+50,000-word document is a single transform costing ~100x a normal one. 20k chars
+on FREE, 100k on PRO. `transformsPerMonth` is kept in the type as null on both
+tiers so an abuse ceiling can be set later without a schema change — that would
+be fraud control, not monetization, and the two must not be conflated.
+
+**Still owed:** a per-user rate limit on the transform endpoint. Uncapped free AI
+is an obvious target for scripted abuse, and a rate limit is the right tool for
+that — not a product cap.
 
 *Reasoning* and *execution* are PRO. Both are the product working while the user
 is not looking, which is what recurring money should buy, and both cost per user

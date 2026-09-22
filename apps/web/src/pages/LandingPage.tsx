@@ -227,15 +227,14 @@ function FeatureList({ items, dot }: { items: Feature[]; dot: string }) {
 const FREE: Feature[] = [
   { label: 'Unlimited dumps, forever', note: 'We never ration capture. Not now, not later.' },
   {
-    label: 'We sort 30 of them a month',
-    note: 'Each one comes back as tasks, with the dates pulled out of your own words.',
+    label: 'We sort every one of them',
+    note: 'No monthly allowance, no counter. Each comes back as tasks, with the dates pulled out of your own words.',
   },
   { label: 'Reminders by push and email', note: 'The loop, in full. Not a trial of it.' },
   { label: 'Search everything you ever wrote', note: 'Including the dumps you never sorted.' },
 ];
 
 const PRO: Feature[] = [
-  { label: 'We sort every one of them', note: 'However many you dump. No counter, no ceiling.' },
   {
     label: 'It thinks about your dumps, not just this one',
     note: 'Spots what you keep circling back to and tells you.',
