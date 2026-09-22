@@ -9,15 +9,17 @@ import RotatingPhrase from '../components/RotatingPhrase';
  * shows the thing coming back days later.
  */
 
-const DUMP =
-  "ugh ok — need to call the dentist back before they close, mom's birthday is the 14th " +
-  "and I still haven't got anything, that onboarding idea keeps nagging me (the part " +
-  'where we skip the tour?), and I have to renew the car registration at some point';
+const DUMP_BEFORE = 'ugh ok — need to ';
+const DUMP_TRACED = 'call the dentist back before they close';
+const DUMP_AFTER =
+  ", mom's birthday is the 14th and I still haven't got anything, that onboarding idea " +
+  'keeps nagging me (the part where we skip the tour?), and I have to renew the car ' +
+  'registration at some point';
 
-type Extracted = { title: string; when: string | null; kind: 'task' | 'idea' };
+type Extracted = { title: string; when: string | null; kind: 'task' | 'idea'; traced?: boolean };
 
 const EXTRACTED: Extracted[] = [
-  { title: 'Call the dentist back', when: 'Today, before 5pm', kind: 'task' },
+  { title: 'Call the dentist back', when: 'Today, before 5pm', kind: 'task', traced: true },
   { title: "Get mom's birthday gift", when: 'Thu 14th', kind: 'task' },
   { title: 'Onboarding: skip the tour?', when: null, kind: 'idea' },
   { title: 'Renew car registration', when: 'No date found', kind: 'task' },
@@ -68,7 +70,9 @@ function TaskRow({ item, visible }: { item: Extracted; visible: boolean }) {
         }`}
       />
       <div className="min-w-0">
-        <p className="text-sm font-medium leading-snug">{item.title}</p>
+        <p className="text-sm font-medium leading-snug">
+          <span className={item.traced ? 'rounded bg-claySoft px-1' : undefined}>{item.title}</span>
+        </p>
         {item.when && (
           <p className={`text-xs ${item.when.startsWith('No') ? 'text-muted' : 'text-clay'}`}>
             {item.when}
@@ -124,13 +128,42 @@ function Hero() {
           {/* Before: the scrawl. */}
           <div className="-rotate-1 rounded-xl border border-rule bg-card p-5 shadow-sm">
             <p className="mb-2 text-[11px] uppercase tracking-widest text-muted">11:48pm</p>
-            <p className="font-hand text-2xl leading-snug text-ink/75">{DUMP}</p>
+            <p className="font-hand text-2xl leading-snug text-ink/75">
+              {DUMP_BEFORE}
+              <span className="relative whitespace-nowrap rounded bg-claySoft px-1 text-ink">
+                {DUMP_TRACED}
+              </span>
+              {DUMP_AFTER}
+            </p>
           </div>
 
-          <div className="relative my-4 flex items-center justify-center">
-            <div className="h-px flex-1 bg-rule" />
-            <span className="px-3 text-xs tracking-widest text-muted">UNTANGLED</span>
-            <div className="h-px flex-1 bg-rule" />
+          <div className="relative my-3 h-12">
+            <svg
+              aria-hidden
+              viewBox="0 0 400 48"
+              preserveAspectRatio="none"
+              className="absolute inset-0 h-full w-full text-clay/55"
+            >
+              <path
+                d="M236 2 C236 22, 214 24, 214 44"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeDasharray="4 5"
+              />
+              <path
+                d="M209 38 L214 45 L219 38"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+            <span className="absolute right-0 top-1/2 -translate-y-1/2 text-xs tracking-widest text-muted">
+              UNTANGLED
+            </span>
           </div>
 
           {/* After: the same thing, usable. */}
