@@ -84,20 +84,33 @@ Do not re-litigate these without new sources.
   input, and must use the Batch API (50% off, no latency requirement).
 - **A2P 10DLC is mandatory for any traffic that touches carrier SMS, and is
   provider-independent.** US carriers have blocked 100% of unregistered 10DLC
-  traffic since Feb 2025 (The Campaign Registry). ~5–7 business days to approve;
-  registering EIN must be ≥15 days old. It gates any carrier-SMS launch date.
+  traffic since Feb 2025 (The Campaign Registry). ~5–7 business days to approve. The
+  15-day EIN-age rule is **not** a blocker here — the founder's EIN is well
+  established, so registration can be filed immediately and the whole lead time
+  is the carrier approval itself.
   Native iMessage does *not* need it — but an iMessage provider's RCS/SMS
   fallback leg runs on our registration, so a fallback chain does not avoid it,
   it only narrows it to the Android slice.
-- **Never route reminders through the iMessage vendor.** This is a contract
-  constraint, not a preference. Sendblue's ~$100/month AI Agent plan is
-  *inbound-first*; proactive outbound moves you to their unpriced "Blue Ocean"
-  plan, quoted by sales. A reply inside a conversation the user just started
-  ("got it, saved") is fine — a reminder three days later is proactive by
-  definition and is exactly what the cheap plan excludes. So a ticket that says
-  "send reminders over iMessage, it's nicer" is a vendor contract change wearing
-  a feature's clothes, and it goes to the founder, never into a sprint. Reminders
-  ride push + email.
+- **Do not route reminders through the iMessage vendor — for now.** This was
+  previously written as an absolute "never", which overstated it. Two separate
+  reasons, one conditional and one structural:
+
+  *Conditional (commercial).* Sendblue's ~$100/month AI Agent plan is
+  **inbound-first**: an in-conversation reply ("got it, saved") is fine, but a
+  reminder three days later is proactive by definition and pushes you onto their
+  unpriced "Blue Ocean" plan, quoted by sales. **Linq's $289 plan may permit
+  outbound — nobody has checked.** That is an open question in #3, so this
+  constraint lifts if Linq allows proactive sending at a flat price.
+
+  *Structural (physical).* Apple rate-limits iMessage per account. Outbound runs
+  ~100 messages/user/month, so at any real scale you hit a throughput ceiling no
+  plan can buy past. Push and email have no such ceiling. This reason does not
+  lift no matter what #3 finds, which is why reminders default to push + email
+  and iMessage stays a *capture* channel.
+
+  A ticket proposing iMessage reminders is still a vendor contract change rather
+  than a feature, so it goes to the founder — but the answer is "pending #3",
+  not a flat no.
 - **Outbound is the volume multiplier, not inbound.** Reminders run ~100
   messages/user/month; capture runs ~30 dumps/user/month and only from paying
   users. So outbound is where per-message pricing compounds and must stay on
@@ -214,6 +227,27 @@ Turborepo + npm workspaces, Node ≥22. Mirrors `ludakhris/interview-differently
 
 `docker compose up -d postgres` for local DB. Dev servers via `.claude/launch.json`
 (web 5173, api 3000).
+
+## Branches
+
+Two protected branches, unlike `interview-differently` which ships straight from
+its default branch:
+
+- **`main` → production.** Nothing lands here that has not been through `beta`.
+- **`beta` → the beta app.** A real, deployed test system against real
+  infrastructure, not a local dev server.
+
+Flow: feature branch → PR into `beta` → soak on the beta app → promote `beta`
+into `main`. CI runs on pushes and PRs to both.
+
+The point of `beta` is the class of bug that only appears against real
+infrastructure — timezone-correct reminder scheduling (#18), inbound webhook
+routing (#22), Stripe, and email deliverability — none of which a local dev
+server exercises honestly.
+
+Branch protection rules are set in GitHub repo settings, not in this repo, so
+they are not version-controlled here. Both branches should require CI to pass
+before merge.
 
 ## Schema invariant
 
