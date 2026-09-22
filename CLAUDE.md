@@ -24,6 +24,7 @@ Change it there, never hardcode a quota.
 | AI **extraction** (dump → tasks) | unlimited | unlimited |
 | AI **reasoning** (insights, digest) | — | yes |
 | AI **task execution** (does the task) | — | yes |
+| Reminders | every one you set | + **the nag that escalates** |
 | Reminder channels | push, email | push, email, **SMS** |
 | MCP connectors | no | yes |
 
@@ -163,11 +164,25 @@ Do not re-litigate these without new sources.
   remains the differentiation, and it is now the *only* one — so a plan that
   waters it down (see the open meter question) removes the last thing separating
   us from an incumbent with a free tier and a head start.
-- **The meter may be on the wrong thing.** CLAUDE.md calls the outbound loop the
-  moat, but TIER_LIMITS meters the transform and gives push/email reminders away
-  free and unlimited. Open question whether persistent re-surfacing should move to
-  PRO — it improves the pricing story but weakens a free tier we want to be better
-  than the competitor's. Unresolved; this is a positioning call.
+- **Persistent re-surfacing: DECIDED — PRO** (`persistentResurfacing`). FREE gets
+  every reminder it sets, delivered on time in the user's timezone. PRO gets the
+  nag that escalates when a reminder goes unacknowledged.
+
+  Not a cost pass-through in the way reasoning and execution are — web push over
+  VAPID is genuinely $0 per message. The real reasons are volume and reputation:
+  ~3 extra sends per reminder against ~100 reminders/user/month is 3M extra
+  emails a month at 10k users, which is a real Resend bill; and high-frequency
+  email from a young sending domain is precisely what gets a sender marked as
+  spam. **That reputation is shared**, so unlimited nagging on FREE would degrade
+  delivery for everyone — including the plain reminders the free tier depends on.
+  Gating escalation protects the channel free users rely on.
+
+  **Accepted risk:** the outbound loop is the only differentiation from
+  getbraindump, and this puts part of it behind the paywall. FREE still gets the
+  whole loop end to end — dump, untangle, it comes back — which neither
+  competitor offers at all. What FREE does not get is the loop refusing to give
+  up. If escalation turns out to carry most of the product's value, revisit:
+  adding a paid tier later is easier than taking a free feature away.
 - **Name: DECIDED — `mind-dump.com`, with `brain-dump.ai` forwarding to it.**
   USPTO TESS turned up no "brain dump" mark, so the trademark objection that
   drove this is gone. The decision came down to TLD, not to the words:

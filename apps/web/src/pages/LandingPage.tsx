@@ -263,7 +263,10 @@ const FREE: Feature[] = [
     label: 'We untangle every one of them',
     note: 'Typos tidied, tasks pulled out, dates found, tags added, reminders set. No allowance, no counter.',
   },
-  { label: 'Reminders by push and email', note: 'The loop, in full. Not a trial of it.' },
+  {
+    label: 'Reminders by push and email',
+    note: 'Every reminder you set, on time, in your timezone. Not a trial of it.',
+  },
   { label: 'Search everything you ever wrote', note: 'Including the half-finished ones you never came back to.' },
 ];
 
