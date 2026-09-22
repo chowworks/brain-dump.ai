@@ -162,7 +162,7 @@ function Hero() {
               />
             </svg>
             <span className="absolute right-0 top-1/2 -translate-y-1/2 text-xs tracking-widest text-muted">
-              UNTANGLED
+              MADE USABLE
             </span>
           </div>
 
