@@ -206,32 +206,68 @@ function FounderNote() {
   );
 }
 
+type Feature = { label: string; note?: string };
+
+function FeatureList({ items, dot }: { items: Feature[]; dot: string }) {
+  return (
+    <ul className="mt-6 space-y-3.5 text-sm">
+      {items.map((f) => (
+        <li key={f.label} className="flex gap-2.5">
+          <span className={`mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full ${dot}`} />
+          <span>
+            {f.label}
+            {f.note && <span className="mt-0.5 block text-xs text-muted">{f.note}</span>}
+          </span>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+const FREE: Feature[] = [
+  { label: 'Unlimited dumps, forever', note: 'We never ration capture. Not now, not later.' },
+  {
+    label: '30 AI sorts a month',
+    note: 'Your tangle becomes tasks, with dates pulled out of the words.',
+  },
+  { label: 'Reminders by push and email', note: 'The loop, in full. Not a trial of it.' },
+  { label: 'Search everything you ever wrote', note: 'Including the dumps you never sorted.' },
+];
+
+const PRO: Feature[] = [
+  { label: 'Unlimited AI sorts' },
+  {
+    label: 'It thinks about your dumps, not just this one',
+    note: 'Spots what you keep circling back to and tells you.',
+  },
+  {
+    label: 'It does the task, not just the reminding',
+    note: '"Find out if we need a permit" comes back as the answer.',
+  },
+  { label: 'Text your thoughts in from anywhere', note: 'No app, no login. Just text it.' },
+  { label: 'It keeps asking until it is done', note: 'The nag that escalates instead of giving up.' },
+  { label: 'Connect it to Claude and other AI tools' },
+];
+
 function Pricing() {
   return (
     <section id="pricing" className="mx-auto max-w-6xl px-6 py-20">
       <h2 className="font-display text-4xl tracking-tight">Free is actually free.</h2>
-      <p className="mt-3 max-w-lg leading-relaxed text-muted">
-        Capture is never rationed and never will be — a tool you hesitate to use is a tool you
-        stop using. You pay when you want us doing the work while you&apos;re not looking.
+      <p className="mt-3 max-w-xl leading-relaxed text-muted">
+        Free gets the whole loop — dump it, we sort it, it comes back. You pay when you want it
+        working while you are not: thinking across everything you have written, and going off and
+        doing the thing instead of reminding you to.
       </p>
 
       <div className="mt-10 grid gap-5 md:grid-cols-2">
         <div className="rounded-2xl border border-rule bg-card p-7">
           <p className="font-display text-2xl">Free</p>
           <p className="mt-1 text-sm text-muted">Everything you need to stop losing things.</p>
-          <ul className="mt-6 space-y-3 text-sm">
-            {[
-              'Unlimited dumps, forever',
-              '30 AI sorts a month',
-              'Reminders by push and email',
-              'Search everything you ever wrote',
-            ].map((f) => (
-              <li key={f} className="flex gap-2.5">
-                <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-sage" />
-                {f}
-              </li>
-            ))}
-          </ul>
+          <FeatureList items={FREE} dot="bg-sage" />
+          <p className="mt-6 border-t border-rule pt-4 text-xs leading-relaxed text-muted">
+            The AI sorts your dump and dates it. It does not go and <em>do</em> it, and it does not
+            reason across everything you have written — those are Pro.
+          </p>
         </div>
 
         <div className="relative rounded-2xl border-2 border-clay bg-card p-7">
@@ -239,22 +275,10 @@ function Pricing() {
             For the relentless
           </span>
           <p className="font-display text-2xl">Pro</p>
-          <p className="mt-1 text-sm text-muted">When forgetting costs you something.</p>
-          <ul className="mt-6 space-y-3 text-sm">
-            {[
-              'Unlimited AI sorts',
-              'It spots the patterns you keep circling',
-              'It does the task, not just the reminding',
-              'Text your thoughts in from anywhere',
-              "It keeps asking until it's done",
-              'Connect it to Claude and other AI tools',
-            ].map((f) => (
-              <li key={f} className="flex gap-2.5">
-                <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-clay" />
-                {f}
-              </li>
-            ))}
-          </ul>
+          <p className="mt-1 text-sm text-muted">
+            Everything in Free, plus the AI working while you are not.
+          </p>
+          <FeatureList items={PRO} dot="bg-clay" />
         </div>
       </div>
     </section>
